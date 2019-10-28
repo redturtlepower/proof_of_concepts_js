@@ -1,0 +1,23 @@
+<html>
+<head>
+<script type="text/javascript" src="./index.js"></script>
+<script type="text/javascript" src="./leaflet-webcomponent.js"></script>
+</head>
+<body>
+
+Leaflet webcomponent demo:
+<leaflet-map>
+</leaflet-map>
+
+Leaflet webcomponent inserted by script:
+<div id="map">
+<leaflet-map>
+</leaflet-map>
+</div>
+<script>
+(function(){
+addWebcomponentFromScript(document.getElementById("map"))
+})()
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<html>
+<head>
+</head>
+<body>
+<style>
+  .thumb {
+    height: 75px;
+    border: 1px solid #000;
+    margin: 10px 5px 0 0;
+  }
+</style>
+
+Action required! Click on "Choose Files" to select a js file from one of the 'src-*'-folders.<br>
+Please open console for feedback (press F12).<br><br>
+<input type="file" id="files" name="files[]" multiple />
+<output id="list"></output>
+<script>
+  function handleFileSelect(evt) {
+    var files = evt.target.files; // FileList object
+
+    // Loop through the FileList and render image files as thumbnails.
+    for (var i = 0, f; f = files[i]; i++) {
+
+      // Only process image files.
+      if (f.type.match('image.*')) {
+          var reader = new FileReader();
+
+          // Closure to capture the file information.
+          reader.onload = (function(theFile) {
+            console.log("function(theFile): " + theFile.name)
+            return function(e) {
+              console.log("Render:")
+              // Render thumbnail.
+              var span = document.createElement('span');
+              span.innerHTML = ['<img class="thumb" src="', e.target.result,
+                                '" title="', escape(theFile.name), '"/>'].join('');
+              document.getElementById('list').insertBefore(span, null);
+            };
+          })(f);
+
+          // Read in the image file as a data URL.
+          reader.readAsDataURL(f);
+      }else if (f.type.match('text/javascript')){
+          var reader = new FileReader();
+
+          // Closure to capture the file information.
+          reader.onload = (function(theFile) {
+            console.log("function(theFile): " + theFile.name)
+            return function(e) {
+                /* If the script to be loaded contains 'alert("Test script loaded!")'
+                then e.target.result will look like
+                'data:text/javascript;base64,YWxlcnQoIlRlc3Qgc2NyaXB0IGxvYWRlZCEiKQ=='
+                where 'YWxlcnQoIlRlc3Qgc2NyaXB0IGxvYWRlZCEiKQ==' is the base64 encoded content. */
+                var base64 = e.target.result.substring(("data:text/javascript;base64,").length)
+                var code = atob(base64)
+                console.log("Render:" + code)
+                //eval(code)
+                  
+                // Load a JavaScript file dynamically and call a function from it
+                var params = {}; // If you want to pass anything, to the called function
+                var script = document.createElement("script");
+                
+                script.type = "text/javascript";
+                //script.type = "module";
+                
+                script.onload = function () {
+                    //theFunctionInsideExternalScript(params);
+                    
+                    var test = new LoadDynamicJs.Test();
+                }
+                script.src = theFile.name;
+                document.getElementsByTagName("head")[0].appendChild(script)
+            
+            };
+          })(f);
+
+          // Read in the image file as a data URL.
+          reader.readAsDataURL(f);
+      }
+      else{
+        continue;
+      }
+    }
+  }
+
+  document.getElementById('files').addEventListener('change', handleFileSelect, false);
+</script>
+</body>
